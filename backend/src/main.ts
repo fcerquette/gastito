@@ -1,12 +1,19 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NestExpressApplication } from '@nestjs/platform-express';
 import cookieParser from 'cookie-parser';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(AppModule);
   const config = app.get(ConfigService);
+
+  // Trust the Render/proxy in front so req.secure refleja el HTTPS real
+  // y las cookies con `secure: true` se aceptan en producción.
+  if (config.get<string>('NODE_ENV') === 'production') {
+    app.set('trust proxy', 1);
+  }
 
   app.setGlobalPrefix('api');
   app.use(cookieParser());
