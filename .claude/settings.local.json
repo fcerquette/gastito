@@ -8,7 +8,8 @@
       "Bash(npx tsc:*)",
       "Bash(nslookup db.ouuttgmwpnyrzrhucign.supabase.co)",
       "Bash(echo \"BACKEND_EXIT=$?\")",
-      "Bash(echo \"FRONTEND_EXIT=$?\")"
+      "Bash(echo \"FRONTEND_EXIT=$?\")",
+      "WebFetch(domain:gastito-web-qeud.onrender.com)"
     ]
   }
 }

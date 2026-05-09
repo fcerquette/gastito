@@ -12,7 +12,7 @@ services:
     rootDir: backend
     buildCommand: npm install --include=dev && npm run build
     startCommand: npm run start:prod
-    healthCheckPath: /api/auth/me
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production

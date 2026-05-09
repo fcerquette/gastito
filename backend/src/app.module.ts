@@ -7,6 +7,7 @@ import { GroupsModule } from './groups/groups.module';
 import { ExpensesModule } from './expenses/expenses.module';
 import { SettlementsModule } from './settlements/settlements.module';
 import { BalancesModule } from './balances/balances.module';
+import { HealthController } from './health.controller';
 
 @Module({
   imports: [
@@ -31,5 +32,6 @@ import { BalancesModule } from './balances/balances.module';
     SettlementsModule,
     BalancesModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
