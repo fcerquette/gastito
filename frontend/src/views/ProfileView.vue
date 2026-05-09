@@ -91,6 +91,26 @@ async function logout() {
     <button class="logout-btn" @click="logout">
       <i class="pi pi-sign-out" /> Cerrar sesión
     </button>
+
+    <section class="coffee-card">
+      <div class="coffee-emoji">☕💚</div>
+      <h3 style="margin: 0">Hecho con amor</h3>
+      <p class="gst-muted" style="margin: 0">
+        Si Gastito te sirvió, podés invitarme un café para bancar el proyecto.
+        ¡Cualquier monto suma muchísimo!
+      </p>
+      <a
+        class="coffee-btn"
+        href="https://link.mercadopago.com.ar/gastito"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        ☕ Invitame un café
+      </a>
+      <p class="coffee-foot gst-muted">
+        Pago seguro vía Mercado Pago · acepta tarjetas, transferencia y efectivo
+      </p>
+    </section>
   </div>
 </template>
 
@@ -154,5 +174,51 @@ async function logout() {
   border-radius: 8px;
   padding: 0.6rem 0.9rem;
   font-size: 0.9rem;
+}
+.coffee-card {
+  margin-top: 1rem;
+  padding: 1.25rem;
+  border-radius: 16px;
+  background: linear-gradient(135deg, #fef3c7 0%, #d1fae5 100%);
+  border: 1px solid #fde68a;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  align-items: center;
+}
+.coffee-emoji {
+  font-size: 2rem;
+  line-height: 1;
+}
+.coffee-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: white;
+  color: #92400e;
+  border: 2px solid #f59e0b;
+  padding: 0.75rem 1.5rem;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 6px rgba(245, 158, 11, 0.15);
+}
+.coffee-btn:hover {
+  background: #f59e0b;
+  color: white;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.35);
+}
+.coffee-btn:active {
+  transform: translateY(0);
+}
+.coffee-foot {
+  font-size: 0.75rem;
+  margin: 0;
 }
 </style>

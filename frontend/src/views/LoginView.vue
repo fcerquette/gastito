@@ -24,6 +24,15 @@ function login() {
       <p class="gst-muted" style="font-size: 0.8rem; text-align: center; margin-top: 1.5rem">
         Usamos Google para autenticarte. No guardamos tu contraseña.
       </p>
+
+      <p class="made-with-love">
+        Hecho con 💚 ·
+        <a
+          href="https://link.mercadopago.com.ar/gastito"
+          target="_blank"
+          rel="noopener noreferrer"
+        >invitame un café ☕</a>
+      </p>
     </div>
   </div>
 </template>
@@ -73,5 +82,20 @@ function login() {
 }
 .google-btn:hover {
   background: var(--gst-bg);
+}
+.made-with-love {
+  font-size: 0.78rem;
+  text-align: center;
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  color: var(--gst-text-muted);
+}
+.made-with-love a {
+  color: #d97706;
+  font-weight: 600;
+  text-decoration: none;
+}
+.made-with-love a:hover {
+  text-decoration: underline;
 }
 </style>
