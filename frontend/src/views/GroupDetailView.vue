@@ -128,6 +128,17 @@ async function deleteExpense(expId: string) {
 }
 
 const isOwner = computed(() => group.value?.createdById === auth.currentUser?.id);
+
+type GroupStatus = 'empty' | 'settled' | 'open';
+const statusInfo = computed<{ kind: GroupStatus; label: string }>(() => {
+  if (expenses.value.length === 0) return { kind: 'empty', label: 'Sin gastos' };
+  if (balances.value.length === 0) return { kind: 'settled', label: 'Saldado' };
+  return { kind: 'open', label: 'En curso' };
+});
+
+function goEdit() {
+  router.push({ name: 'group-edit', params: { id: props.id } });
+}
 </script>
 
 <template>
@@ -139,8 +150,29 @@ const isOwner = computed(() => group.value?.createdById === auth.currentUser?.id
     </div>
 
     <template v-else-if="group">
-      <header class="gst-stack" style="gap: 0.25rem">
-        <h2 style="margin: 0">{{ group.name }}</h2>
+      <header class="gst-stack" style="gap: 0.4rem">
+        <div class="gst-row-between">
+          <h2 style="margin: 0">{{ group.name }}</h2>
+          <button v-if="isOwner" class="icon-action" @click="goEdit" aria-label="Editar grupo">
+            <i class="pi pi-pencil" />
+          </button>
+        </div>
+        <div class="gst-row" style="gap: 0.5rem; flex-wrap: wrap">
+          <span class="status-badge" :class="`status-${statusInfo.kind}`">
+            <i
+              :class="[
+                'pi',
+                statusInfo.kind === 'settled' ? 'pi-check-circle' :
+                statusInfo.kind === 'open' ? 'pi-clock' : 'pi-inbox'
+              ]"
+              style="font-size: 0.75rem"
+            />
+            {{ statusInfo.label }}
+          </span>
+          <span class="gst-muted" style="font-size: 0.85rem">
+            {{ expenses.length }} {{ expenses.length === 1 ? 'gasto' : 'gastos' }}
+          </span>
+        </div>
         <p v-if="group.description" class="gst-muted" style="margin: 0">{{ group.description }}</p>
       </header>
 
@@ -418,5 +450,46 @@ const isOwner = computed(() => group.value?.createdById === auth.currentUser?.id
 }
 .add-btn:disabled {
   opacity: 0.6;
+}
+.icon-action {
+  background: transparent;
+  border: 1px solid var(--gst-border);
+  color: var(--gst-text-muted);
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.icon-action:hover {
+  color: var(--gst-primary-dark);
+  border-color: var(--gst-primary);
+}
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: 1px solid;
+}
+.status-settled {
+  background: #ecfdf5;
+  color: #065f46;
+  border-color: #a7f3d0;
+}
+.status-open {
+  background: #fef3c7;
+  color: #92400e;
+  border-color: #fde68a;
+}
+.status-empty {
+  background: var(--gst-bg);
+  color: var(--gst-text-muted);
+  border-color: var(--gst-border);
 }
 </style>

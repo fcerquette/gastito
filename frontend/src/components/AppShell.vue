@@ -16,6 +16,8 @@ const title = computed(() => {
       return 'Nuevo grupo';
     case 'group-detail':
       return 'Grupo';
+    case 'group-edit':
+      return 'Editar grupo';
     case 'expense-new':
       return 'Nuevo gasto';
     case 'settlement-new':

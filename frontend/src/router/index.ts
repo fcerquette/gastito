@@ -35,6 +35,12 @@ const routes: RouteRecordRaw[] = [
         props: true,
       },
       {
+        path: 'groups/:id/edit',
+        name: 'group-edit',
+        component: () => import('@/views/EditGroupView.vue'),
+        props: true,
+      },
+      {
         path: 'groups/:id/expenses/new',
         name: 'expense-new',
         component: () => import('@/views/NewExpenseView.vue'),
