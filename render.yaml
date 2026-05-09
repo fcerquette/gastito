@@ -1,0 +1,53 @@
+# Blueprint de Render para Gastito.
+# Importalo desde: Render Dashboard → New → Blueprint → conectá el repo.
+# Después de creados los servicios, completá los secrets que dicen "sync: false".
+
+services:
+  # Backend NestJS
+  - type: web
+    name: gastito-api
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm run start:prod
+    healthCheckPath: /api/auth/me
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: JWT_EXPIRES_IN
+        value: 30d
+      - key: JWT_SECRET
+        generateValue: true
+      - key: COOKIE_DOMAIN
+        value: ""
+      # Estos los completás vos en el dashboard después de crear el blueprint
+      - key: DATABASE_URL
+        sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: GOOGLE_CALLBACK_URL
+        sync: false
+      - key: FRONTEND_URL
+        sync: false
+
+  # Frontend Vue (Static Site)
+  - type: web
+    name: gastito-web
+    runtime: static
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        sync: false
+    routes:
+      # SPA fallback: cualquier ruta no encontrada cae a index.html
+      - type: rewrite
+        source: /*
+        destination: /index.html

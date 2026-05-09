@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Bash(npx vue-tsc:*)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(npm run:*)",
+      "Bash(npx tsc:*)",
+      "Bash(nslookup db.ouuttgmwpnyrzrhucign.supabase.co)",
+      "Bash(echo \"BACKEND_EXIT=$?\")",
+      "Bash(echo \"FRONTEND_EXIT=$?\")"
+    ]
+  }
+}

@@ -1,0 +1,129 @@
+### Gastito API - Tests
+### Requiere extensión REST Client de VS Code (humao.rest-client)
+### Para auth, primero abrí http://localhost:3000/api/auth/google en el navegador
+### y completá el login con Google. La cookie queda guardada.
+### Para usar acá copiá el valor de la cookie 'gastito_token' de las DevTools
+### y pegalo en @token de abajo.
+
+@baseUrl = http://localhost:3000/api
+@token = PEGAR_AQUI_EL_VALOR_DE_LA_COOKIE_gastito_token
+
+### 1. Ver mi perfil (verifica que el token funciona)
+GET {{baseUrl}}/auth/me
+Cookie: gastito_token={{token}}
+
+### 2. Actualizar mi teléfono
+PATCH {{baseUrl}}/users/me
+Cookie: gastito_token={{token}}
+Content-Type: application/json
+
+{
+  "phone": "+5493415551234"
+}
+
+### 3. Listar mis grupos
+GET {{baseUrl}}/groups
+Cookie: gastito_token={{token}}
+
+### 4. Crear un grupo
+POST {{baseUrl}}/groups
+Cookie: gastito_token={{token}}
+Content-Type: application/json
+
+{
+  "name": "Viaje a Bariloche",
+  "description": "Finde largo de octubre",
+  "defaultCurrency": "ARS",
+  "members": [
+    { "email": "amigo1@example.com", "name": "Juan" },
+    { "email": "amigo2@example.com", "name": "María" }
+  ]
+}
+
+### 5. Ver detalle del grupo (reemplazá GROUP_ID con el ID que devolvió el paso 4)
+@groupId = REEMPLAZAR_CON_ID
+GET {{baseUrl}}/groups/{{groupId}}
+Cookie: gastito_token={{token}}
+
+### 6. Agregar un miembro al grupo
+POST {{baseUrl}}/groups/{{groupId}}/members
+Cookie: gastito_token={{token}}
+Content-Type: application/json
+
+{
+  "email": "otro@example.com",
+  "name": "Pedro"
+}
+
+### 7. Crear un gasto dividido en partes iguales entre todos
+### Necesitás los groupMemberId que vienen en /groups/:id (campo members[].id)
+POST {{baseUrl}}/groups/{{groupId}}/expenses
+Cookie: gastito_token={{token}}
+Content-Type: application/json
+
+{
+  "description": "Cena del viernes",
+  "amount": 12000,
+  "currency": "ARS",
+  "paidById": "TU_USER_ID",
+  "date": "2026-05-07",
+  "splitMode": "equal",
+  "splits": [
+    { "groupMemberId": "MEMBER_ID_1" },
+    { "groupMemberId": "MEMBER_ID_2" },
+    { "groupMemberId": "MEMBER_ID_3" }
+  ]
+}
+
+### 8. Crear un gasto con montos exactos por persona
+POST {{baseUrl}}/groups/{{groupId}}/expenses
+Cookie: gastito_token={{token}}
+Content-Type: application/json
+
+{
+  "description": "Cena con postre extra de Juan",
+  "amount": 15000,
+  "currency": "ARS",
+  "paidById": "TU_USER_ID",
+  "date": "2026-05-07",
+  "splitMode": "amounts",
+  "splits": [
+    { "groupMemberId": "MEMBER_ID_1", "value": 6000 },
+    { "groupMemberId": "MEMBER_ID_2", "value": 4500 },
+    { "groupMemberId": "MEMBER_ID_3", "value": 4500 }
+  ]
+}
+
+### 9. Listar gastos del grupo
+GET {{baseUrl}}/groups/{{groupId}}/expenses
+Cookie: gastito_token={{token}}
+
+### 10. Ver balances simplificados (la magia)
+GET {{baseUrl}}/groups/{{groupId}}/balances
+Cookie: gastito_token={{token}}
+
+### 11. Marcar un split como pagado
+PATCH {{baseUrl}}/expense-splits/SPLIT_ID
+Cookie: gastito_token={{token}}
+Content-Type: application/json
+
+{
+  "isPaid": true
+}
+
+### 12. Registrar un settlement (pago directo entre miembros)
+POST {{baseUrl}}/groups/{{groupId}}/settlements
+Cookie: gastito_token={{token}}
+Content-Type: application/json
+
+{
+  "fromMemberId": "MEMBER_ID_1",
+  "toMemberId": "MEMBER_ID_2",
+  "amount": 3000,
+  "currency": "ARS",
+  "date": "2026-05-07",
+  "note": "Transferencia por Mercado Pago"
+}
+
+### 13. Logout
+POST {{baseUrl}}/auth/logout

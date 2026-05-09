@@ -1,0 +1,159 @@
+:root {
+  --gst-bg: #f8fafc;
+  --gst-surface: #ffffff;
+  --gst-border: #e5e7eb;
+  --gst-text: #0f172a;
+  --gst-text-muted: #64748b;
+  --gst-primary: #10b981;
+  --gst-primary-dark: #059669;
+  --gst-danger: #ef4444;
+  --gst-positive: #16a34a;
+  --gst-negative: #dc2626;
+  --gst-radius: 12px;
+  --gst-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#app {
+  margin: 0;
+  padding: 0;
+  min-height: 100%;
+  background: var(--gst-bg);
+  color: var(--gst-text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+    'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  font-size: 15px;
+}
+
+a {
+  color: var(--gst-primary-dark);
+  text-decoration: none;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0 0 0.5rem 0;
+}
+
+h1 {
+  font-size: 1.4rem;
+}
+h2 {
+  font-size: 1.2rem;
+}
+h3 {
+  font-size: 1.05rem;
+}
+
+.gst-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 1rem;
+  padding-bottom: 5rem; /* dejar espacio para bottom nav */
+}
+
+.gst-card {
+  background: var(--gst-surface);
+  border: 1px solid var(--gst-border);
+  border-radius: var(--gst-radius);
+  padding: 1rem;
+  box-shadow: var(--gst-shadow);
+}
+
+.gst-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.gst-stack-lg {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.gst-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.gst-row-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.gst-muted {
+  color: var(--gst-text-muted);
+  font-size: 0.85rem;
+}
+
+.gst-positive {
+  color: var(--gst-positive);
+  font-weight: 600;
+}
+
+.gst-negative {
+  color: var(--gst-negative);
+  font-weight: 600;
+}
+
+.gst-fab {
+  position: fixed;
+  right: max(1rem, calc((100vw - 600px) / 2 + 1rem));
+  bottom: 5rem;
+  z-index: 30;
+}
+
+.gst-empty {
+  text-align: center;
+  padding: 2rem 1rem;
+  color: var(--gst-text-muted);
+}
+
+.gst-spinner-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.gst-error {
+  background: #fef2f2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+}
+
+/* PrimeVue input full width by default in forms */
+.gst-form .p-inputtext,
+.gst-form .p-inputnumber,
+.gst-form .p-select,
+.gst-form .p-textarea {
+  width: 100%;
+}
+
+.gst-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.gst-field label {
+  font-weight: 500;
+  font-size: 0.9rem;
+}
