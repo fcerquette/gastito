@@ -29,8 +29,8 @@ Ir al servicio → **Environment** → completar:
 | `DATABASE_URL` | La connection string del **Transaction pooler** de Supabase (`postgresql://postgres.XXX:PASS@aws-0-XXX.pooler.supabase.com:6543/postgres`) |
 | `GOOGLE_CLIENT_ID` | Tu Client ID de Google OAuth |
 | `GOOGLE_CLIENT_SECRET` | Tu Client secret |
-| `GOOGLE_CALLBACK_URL` | `https://gastito-web.onrender.com/api/auth/google/callback` (apunta al **frontend**, no al backend — el static site lo proxea para que la cookie quede first-party) |
-| `FRONTEND_URL` | `https://gastito-web.onrender.com` (la URL del static site) |
+| `GOOGLE_CALLBACK_URL` | `https://gastito-web-qeud.onrender.com/api/auth/google/callback` (apunta al **frontend**, no al backend — el static site lo proxea para que la cookie quede first-party) |
+| `FRONTEND_URL` | `https://gastito-web-qeud.onrender.com` (la URL del static site) |
 
 `NODE_ENV`, `JWT_EXPIRES_IN`, `JWT_SECRET` y `COOKIE_DOMAIN` ya quedan seteadas automáticamente por el blueprint.
 
@@ -38,7 +38,7 @@ Ir al servicio → **Environment** → completar:
 
 `VITE_API_URL` queda en `/api` por el blueprint (relativo, mismo origen). No hace falta tocar nada.
 
-Si tu backend **no** está en `gastito-api.onrender.com`, editá `frontend/public/_redirects` y cambiá la URL del proxy ahí.
+Si tu backend **no** está en `gastito-api-2g17.onrender.com`, editá `frontend/public/_redirects` y cambiá la URL del proxy ahí.
 
 > **Importante**: las variables `VITE_*` se inyectan **en build time**. Si las cambiás, hay que volver a deployar.
 
@@ -47,10 +47,10 @@ Si tu backend **no** está en `gastito-api.onrender.com`, editá `frontend/publi
 En [Google Cloud Console](https://console.cloud.google.com/) → APIs y servicios → Credenciales → editá el Client ID que ya tenés:
 
 **Authorized JavaScript origins** — agregar:
-- `https://gastito-web.onrender.com`
+- `https://gastito-web-qeud.onrender.com`
 
 **Authorized redirect URIs** — agregar:
-- `https://gastito-web.onrender.com/api/auth/google/callback`
+- `https://gastito-web-qeud.onrender.com/api/auth/google/callback`
 
 > Ojo: la redirect URI apunta al dominio del **frontend** (el static site), no al del backend. El static site tiene un proxy `_redirects` que reenvía `/api/*` al backend; así la cookie de sesión queda first-party en el dominio del frontend y funciona en mobile (iOS/Safari bloquea cookies cross-site).
 
@@ -64,7 +64,7 @@ Cuando termine:
 - `gastito-api` debería loguear `🚀 Gastito API listening on http://localhost:10000/api`
 - `gastito-web` queda servido en su URL
 
-Abrí `https://gastito-web.onrender.com`, login con Google, y debería funcionar end-to-end.
+Abrí `https://gastito-web-qeud.onrender.com`, login con Google, y debería funcionar end-to-end.
 
 ## Caveats del free tier
 
@@ -77,7 +77,7 @@ Si el backend duerme y te molesta, o lo migrás a un plan pago ($7/mes) o ponés
 ## Troubleshooting
 
 ### "redirect_uri_mismatch" en login
-Revisá que la redirect URI en Google Cloud sea **exactamente** `https://gastito-web.onrender.com/api/auth/google/callback` (apunta al **frontend**, no al backend). Sin barra al final, con `https`, con `/api/` en el medio. Y que coincida con `GOOGLE_CALLBACK_URL` en las env vars del backend.
+Revisá que la redirect URI en Google Cloud sea **exactamente** `https://gastito-web-qeud.onrender.com/api/auth/google/callback` (apunta al **frontend**, no al backend). Sin barra al final, con `https`, con `/api/` en el medio. Y que coincida con `GOOGLE_CALLBACK_URL` en las env vars del backend.
 
 ### CORS error en el browser
 Con el setup same-origin (proxy `_redirects`) no debería haber CORS en producción. Si lo ves, fijate que el frontend esté llamando a `/api/...` y no a la URL absoluta del backend.
