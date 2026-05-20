@@ -51,7 +51,7 @@ services:
       # (necesario para que la sesión ande en mobile).
       - type: rewrite
         source: /api/*
-        destination: https://gastito-api-2g17.onrender.com/api/:splat
+        destination: https://gastito-api-2g17.onrender.com/api/*
       # Fallback SPA
       - type: rewrite
         source: /*
