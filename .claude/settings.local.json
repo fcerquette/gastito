@@ -10,7 +10,8 @@
       "Bash(echo \"BACKEND_EXIT=$?\")",
       "Bash(echo \"FRONTEND_EXIT=$?\")",
       "WebFetch(domain:gastito-web-qeud.onrender.com)",
-      "Bash(cmd /c dir C:\\\\Proyectos\\\\gastito)"
+      "Bash(cmd /c dir C:\\\\Proyectos\\\\gastito)",
+      "PowerShell(git -C \"C:\\\\Proyectos\\\\gastito\" status)"
     ]
   }
 }

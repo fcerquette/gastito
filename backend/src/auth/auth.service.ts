@@ -36,11 +36,23 @@ export class AuthService {
         avatarUrl: profile.avatarUrl,
       });
       user = await this.usersRepo.save(user);
-    } else if (!user.googleId) {
-      // Si existía sin googleId (poco probable pero posible), lo vinculamos
-      user.googleId = profile.googleId;
-      user.avatarUrl = user.avatarUrl || profile.avatarUrl;
-      user = await this.usersRepo.save(user);
+    } else {
+      // Refrescar campos vacíos desde el perfil de Google en cada login.
+      // Cubre usuarios creados sin nombre (por flujos viejos o invitaciones).
+      let dirty = false;
+      if (!user.googleId && profile.googleId) {
+        user.googleId = profile.googleId;
+        dirty = true;
+      }
+      if ((!user.name || !user.name.trim()) && profile.name) {
+        user.name = profile.name;
+        dirty = true;
+      }
+      if (!user.avatarUrl && profile.avatarUrl) {
+        user.avatarUrl = profile.avatarUrl;
+        dirty = true;
+      }
+      if (dirty) user = await this.usersRepo.save(user);
     }
 
     // Vincular invitaciones pendientes
