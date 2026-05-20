@@ -42,7 +42,7 @@ export class AuthController {
     res.cookie('gastito_token', token, {
       httpOnly: true,
       secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
+      sameSite: 'lax',
       maxAge: 30 * 24 * 60 * 60 * 1000, // 30 días
       domain: cookieDomain,
     });
@@ -69,7 +69,7 @@ export class AuthController {
     res.clearCookie('gastito_token', {
       httpOnly: true,
       secure: isProd,
-      sameSite: isProd ? 'none' : 'lax',
+      sameSite: 'lax',
     });
     res.json({ ok: true });
   }

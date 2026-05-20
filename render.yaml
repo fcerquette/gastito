@@ -42,10 +42,9 @@ services:
     buildCommand: npm install --include=dev && npm run build
     staticPublishPath: dist
     envVars:
+      # Same-origin: el frontend proxea /api/* al backend vía public/_redirects.
+      # Si cambiás la URL del backend, actualizá también frontend/public/_redirects.
       - key: VITE_API_URL
-        sync: false
-    routes:
-      # SPA fallback: cualquier ruta no encontrada cae a index.html
-      - type: rewrite
-        source: /*
-        destination: /index.html
+        value: /api
+    # El proxy /api/* y el fallback SPA se manejan en frontend/public/_redirects,
+    # que Render respeta automáticamente al servir el static site.

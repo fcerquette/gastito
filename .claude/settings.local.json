@@ -9,7 +9,8 @@
       "Bash(nslookup db.ouuttgmwpnyrzrhucign.supabase.co)",
       "Bash(echo \"BACKEND_EXIT=$?\")",
       "Bash(echo \"FRONTEND_EXIT=$?\")",
-      "WebFetch(domain:gastito-web-qeud.onrender.com)"
+      "WebFetch(domain:gastito-web-qeud.onrender.com)",
+      "Bash(cmd /c dir C:\\\\Proyectos\\\\gastito)"
     ]
   }
 }

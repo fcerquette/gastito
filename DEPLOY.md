@@ -29,16 +29,16 @@ Ir al servicio → **Environment** → completar:
 | `DATABASE_URL` | La connection string del **Transaction pooler** de Supabase (`postgresql://postgres.XXX:PASS@aws-0-XXX.pooler.supabase.com:6543/postgres`) |
 | `GOOGLE_CLIENT_ID` | Tu Client ID de Google OAuth |
 | `GOOGLE_CLIENT_SECRET` | Tu Client secret |
-| `GOOGLE_CALLBACK_URL` | `https://gastito-api.onrender.com/api/auth/google/callback` (reemplazá si tu URL de Render es distinta) |
+| `GOOGLE_CALLBACK_URL` | `https://gastito-web.onrender.com/api/auth/google/callback` (apunta al **frontend**, no al backend — el static site lo proxea para que la cookie quede first-party) |
 | `FRONTEND_URL` | `https://gastito-web.onrender.com` (la URL del static site) |
 
 `NODE_ENV`, `JWT_EXPIRES_IN`, `JWT_SECRET` y `COOKIE_DOMAIN` ya quedan seteadas automáticamente por el blueprint.
 
 ### `gastito-web` (frontend)
 
-| Variable | Valor |
-|---|---|
-| `VITE_API_URL` | `https://gastito-api.onrender.com/api` |
+`VITE_API_URL` queda en `/api` por el blueprint (relativo, mismo origen). No hace falta tocar nada.
+
+Si tu backend **no** está en `gastito-api.onrender.com`, editá `frontend/public/_redirects` y cambiá la URL del proxy ahí.
 
 > **Importante**: las variables `VITE_*` se inyectan **en build time**. Si las cambiás, hay que volver a deployar.
 
@@ -50,7 +50,9 @@ En [Google Cloud Console](https://console.cloud.google.com/) → APIs y servicio
 - `https://gastito-web.onrender.com`
 
 **Authorized redirect URIs** — agregar:
-- `https://gastito-api.onrender.com/api/auth/google/callback`
+- `https://gastito-web.onrender.com/api/auth/google/callback`
+
+> Ojo: la redirect URI apunta al dominio del **frontend** (el static site), no al del backend. El static site tiene un proxy `_redirects` que reenvía `/api/*` al backend; así la cookie de sesión queda first-party en el dominio del frontend y funciona en mobile (iOS/Safari bloquea cookies cross-site).
 
 Guardá los cambios. Esperá 1-2 minutos a que propague.
 
@@ -75,14 +77,17 @@ Si el backend duerme y te molesta, o lo migrás a un plan pago ($7/mes) o ponés
 ## Troubleshooting
 
 ### "redirect_uri_mismatch" en login
-Revisá que la redirect URI en Google Cloud sea **exactamente** `https://gastito-api.onrender.com/api/auth/google/callback`. Sin barra al final, con `https`, con `/api/` en el medio.
+Revisá que la redirect URI en Google Cloud sea **exactamente** `https://gastito-web.onrender.com/api/auth/google/callback` (apunta al **frontend**, no al backend). Sin barra al final, con `https`, con `/api/` en el medio. Y que coincida con `GOOGLE_CALLBACK_URL` en las env vars del backend.
 
 ### CORS error en el browser
-Asegurate que `FRONTEND_URL` en el backend sea exactamente la URL del frontend (con `https`, sin barra final). Si no coincide, CORS bloquea.
+Con el setup same-origin (proxy `_redirects`) no debería haber CORS en producción. Si lo ves, fijate que el frontend esté llamando a `/api/...` y no a la URL absoluta del backend.
 
-### La cookie no persiste después del login
-- Verificá `NODE_ENV=production` en `gastito-api` (sin eso, las cookies van con `sameSite=lax` y `secure=false`, y los browsers las rechazan cross-domain).
-- Verificá que `COOKIE_DOMAIN` esté **vacío** (no seteado a un dominio). En Render los servicios viven en subdominios distintos de `onrender.com` y compartir cookie por dominio no funciona; cada uno guarda la suya.
+### La cookie no persiste en mobile (Safari/Chrome iOS)
+Este era el problema original que motivó el setup con proxy. Si seguís viéndolo:
+- Verificá que el frontend esté llamando a `/api/...` (relativo) y no a `https://gastito-api...` (absoluto). En DevTools mobile, la URL de las requests tiene que empezar con el dominio del frontend.
+- Verificá que `GOOGLE_CALLBACK_URL` apunte al frontend, no al backend. Si apunta al backend, Google redirige directo ahí, la cookie se setea en el dominio del backend, y volvés a tener el problema cross-site.
+- En DevTools (incluso en mobile vía remote inspect) → Application → Cookies → tiene que aparecer `gastito_token` en el dominio del **frontend**.
+- `COOKIE_DOMAIN` tiene que estar **vacío** para que la cookie quede atada al host que la setea (que es el dominio del frontend, vía proxy).
 
 ### "Cannot connect to database"
 Revisá que el `DATABASE_URL` use el **pooler** de Supabase (`pooler.supabase.com:6543`), no la conexión directa. El plan free de Supabase solo expone IPv6 en la conexión directa, y Render no tiene IPv6.
