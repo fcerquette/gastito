@@ -1,7 +1,1 @@
-# Proxy de la API al backend para que todo sea same-origin
-# (necesario para que las cookies de sesión funcionen en mobile).
-# Cambiá la URL si tu backend no es gastito-api-2g17.onrender.com.
-/api/*  https://gastito-api-2g17.onrender.com/api/:splat  200
-
-# Fallback SPA: cualquier ruta no encontrada cae a index.html
 /*  /index.html  200

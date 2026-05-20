@@ -42,9 +42,17 @@ services:
     buildCommand: npm install --include=dev && npm run build
     staticPublishPath: dist
     envVars:
-      # Same-origin: el frontend proxea /api/* al backend vía public/_redirects.
-      # Si cambiás la URL del backend, actualizá también frontend/public/_redirects.
+      # Same-origin: el frontend proxea /api/* al backend (ver routes abajo).
+      # Si cambiás la URL del backend, actualizá la destination en routes.
       - key: VITE_API_URL
         value: /api
-    # El proxy /api/* y el fallback SPA se manejan en frontend/public/_redirects,
-    # que Render respeta automáticamente al servir el static site.
+    routes:
+      # Proxy de la API al backend para que las cookies sean first-party
+      # (necesario para que la sesión ande en mobile).
+      - type: rewrite
+        source: /api/*
+        destination: https://gastito-api-2g17.onrender.com/api/:splat
+      # Fallback SPA
+      - type: rewrite
+        source: /*
+        destination: /index.html
