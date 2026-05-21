@@ -1,4 +1,6 @@
 import {
+  BadRequestException,
+  ConflictException,
   ForbiddenException,
   Injectable,
   NotFoundException,
@@ -12,6 +14,7 @@ import {
   AddMemberDto,
   CreateGroupDto,
   UpdateGroupDto,
+  UpdateMemberDto,
 } from './groups.dto';
 
 @Injectable()
@@ -132,6 +135,76 @@ export class GroupsService {
       role: 'member' as const,
     });
     return this.membersRepo.save(member);
+  }
+
+  /**
+   * Edita el nombre y/o email de un miembro invitado (sin cuenta).
+   * Solo el owner puede editar. Si el nuevo email coincide con un user
+   * registrado, se vincula automáticamente como miembro real.
+   */
+  async updateMember(
+    groupId: string,
+    userId: string,
+    memberId: string,
+    dto: UpdateMemberDto,
+  ): Promise<GroupMember> {
+    await this.assertMembership(groupId, userId);
+    const group = await this.groupsRepo.findOne({ where: { id: groupId } });
+    if (!group) throw new NotFoundException('Group not found');
+    if (group.createdById !== userId) {
+      throw new ForbiddenException('Solo el creador puede editar miembros');
+    }
+
+    const member = await this.membersRepo.findOne({
+      where: { id: memberId, groupId },
+    });
+    if (!member) throw new NotFoundException('Member not found');
+
+    if (member.userId) {
+      throw new ForbiddenException(
+        'No se puede editar la info de un usuario registrado. Los datos vienen de su cuenta de Google.',
+      );
+    }
+
+    if (dto.email !== undefined) {
+      const email = dto.email.trim().toLowerCase();
+      if (!email) {
+        throw new BadRequestException('Email no puede estar vacío');
+      }
+      // Si el email ya está en otro miembro del mismo grupo (que no sea este), error
+      const conflict = await this.membersRepo
+        .createQueryBuilder('m')
+        .leftJoinAndSelect('m.user', 'u')
+        .where('m.groupId = :groupId', { groupId })
+        .andWhere('m.id != :memberId', { memberId })
+        .andWhere('(m.invitedEmail = :email OR u.email = :email)', { email })
+        .getOne();
+      if (conflict) {
+        throw new ConflictException('Ese email ya está en el grupo');
+      }
+
+      const existingUser = await this.usersRepo.findOne({ where: { email } });
+      if (existingUser) {
+        // Se registró desde la última vez: vincular como user real
+        member.userId = existingUser.id;
+        member.invitedEmail = null;
+        // mantenemos invitedName solo como fallback hasta que el user complete
+      } else {
+        member.invitedEmail = email;
+      }
+    }
+
+    if (dto.name !== undefined) {
+      member.invitedName = dto.name.trim() || null;
+    }
+
+    await this.membersRepo.save(member);
+
+    // Devolver el miembro con la relación user (puede que se acabe de vincular)
+    return this.membersRepo.findOne({
+      where: { id: memberId },
+      relations: ['user'],
+    }) as Promise<GroupMember>;
   }
 
   async removeMember(

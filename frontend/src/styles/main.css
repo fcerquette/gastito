@@ -11,10 +11,25 @@
   --gst-negative: #dc2626;
   --gst-radius: 12px;
   --gst-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  /* Safe-area insets para iPhone (notch + home indicator) — fallback a 0 en otros */
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+  /* Padding lateral del contenido (más generoso que antes) */
+  --gst-pad-x: 1.25rem;
+}
+
+@media (min-width: 480px) {
+  :root {
+    --gst-pad-x: 1.5rem;
+  }
 }
 
 * {
   box-sizing: border-box;
+  /* Saca el flash gris en Android al tocar; usamos hover/active explícitos */
+  -webkit-tap-highlight-color: transparent;
 }
 
 html,
@@ -28,10 +43,40 @@ body,
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
     'Helvetica Neue', sans-serif;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  /* Mejor scroll en iOS y evita rubber-band horizontal */
+  overscroll-behavior-y: contain;
+  text-size-adjust: 100%;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
   font-size: 15px;
+}
+
+/* Defaults de touch: cualquier botón/anchor tiene un tamaño mínimo cómodo
+   (las Human Interface Guidelines de Apple recomiendan 44x44pt mínimo). */
+button,
+[role='button'],
+a {
+  touch-action: manipulation;
+}
+
+/* iOS Safari hace auto-zoom cuando focuseás un input con font-size < 16px.
+   Forzamos 16px en mobile para evitar ese mareo. */
+input,
+select,
+textarea {
+  font-family: inherit;
+  font-size: 16px;
+}
+
+@media (min-width: 480px) {
+  input,
+  select,
+  textarea {
+    font-size: 15px;
+  }
 }
 
 a {
@@ -59,15 +104,19 @@ h3 {
 .gst-container {
   max-width: 600px;
   margin: 0 auto;
-  padding: 1rem;
-  padding-bottom: 5rem; /* dejar espacio para bottom nav */
+  /* Padding lateral más generoso que respeta safe-area en iPhone landscape */
+  padding-left: max(var(--gst-pad-x), var(--safe-left));
+  padding-right: max(var(--gst-pad-x), var(--safe-right));
+  padding-top: 1.25rem;
+  /* Espacio inferior + home indicator de iPhone */
+  padding-bottom: calc(5rem + var(--safe-bottom));
 }
 
 .gst-card {
   background: var(--gst-surface);
   border: 1px solid var(--gst-border);
   border-radius: var(--gst-radius);
-  padding: 1rem;
+  padding: 1.1rem 1.15rem;
   box-shadow: var(--gst-shadow);
 }
 
@@ -113,8 +162,8 @@ h3 {
 
 .gst-fab {
   position: fixed;
-  right: max(1rem, calc((100vw - 600px) / 2 + 1rem));
-  bottom: 5rem;
+  right: max(var(--gst-pad-x), calc((100vw - 600px) / 2 + var(--gst-pad-x)));
+  bottom: calc(5rem + var(--safe-bottom));
   z-index: 30;
 }
 

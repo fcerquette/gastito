@@ -16,6 +16,7 @@ import {
   AddMemberDto,
   CreateGroupDto,
   UpdateGroupDto,
+  UpdateMemberDto,
 } from './groups.dto';
 
 @Controller('groups')
@@ -59,6 +60,16 @@ export class GroupsController {
     @Body() dto: AddMemberDto,
   ) {
     return this.service.addMember(id, user.id, dto);
+  }
+
+  @Patch(':id/members/:memberId')
+  updateMember(
+    @CurrentUser() user: User,
+    @Param('id') id: string,
+    @Param('memberId') memberId: string,
+    @Body() dto: UpdateMemberDto,
+  ) {
+    return this.service.updateMember(id, user.id, memberId, dto);
   }
 
   @Delete(':id/members/:memberId')

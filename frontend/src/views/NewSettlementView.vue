@@ -153,10 +153,11 @@ async function submit() {
 <style scoped>
 .text-input {
   width: 100%;
-  padding: 0.6rem 0.8rem;
+  padding: 0.75rem 0.9rem;
+  min-height: 44px;
   border: 1px solid var(--gst-border);
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border-radius: 10px;
+  font-size: 16px;
   background: white;
   font-family: inherit;
 }

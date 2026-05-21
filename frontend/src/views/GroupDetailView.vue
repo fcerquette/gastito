@@ -39,6 +39,12 @@ const newMemberEmail = ref('');
 const newMemberName = ref('');
 const addingMember = ref(false);
 
+// Edición inline de miembros invitados (no registrados)
+const editingMemberId = ref<string | null>(null);
+const editEmail = ref('');
+const editName = ref('');
+const savingEdit = ref(false);
+
 async function loadAll() {
   error.value = null;
   loadingExp.value = true;
@@ -113,6 +119,41 @@ async function removeMember(memberId: string) {
     await loadAll();
   } catch (e) {
     error.value = getErrorMessage(e);
+  }
+}
+
+function startEditMember(m: { id: string; invitedEmail?: string | null; invitedName?: string | null }) {
+  editingMemberId.value = m.id;
+  editEmail.value = m.invitedEmail ?? '';
+  editName.value = m.invitedName ?? '';
+  error.value = null;
+}
+
+function cancelEditMember() {
+  editingMemberId.value = null;
+  editEmail.value = '';
+  editName.value = '';
+}
+
+async function saveEditMember(memberId: string) {
+  const email = editEmail.value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    error.value = 'Email inválido';
+    return;
+  }
+  savingEdit.value = true;
+  error.value = null;
+  try {
+    await groupsApi.updateMember(props.id, memberId, {
+      email,
+      name: editName.value.trim(),
+    });
+    editingMemberId.value = null;
+    await loadAll();
+  } catch (e) {
+    error.value = getErrorMessage(e);
+  } finally {
+    savingEdit.value = false;
   }
 }
 
@@ -256,29 +297,80 @@ function goEdit() {
 
         <ul class="member-list">
           <li v-for="m in group.members" :key="m.id">
-            <MemberAvatar
-              :name="m.user?.name ?? m.invitedName ?? m.invitedEmail"
-              :avatar-url="m.user?.avatarUrl"
-              :size="34"
-            />
-            <div style="flex: 1; min-width: 0">
-              <div style="display: flex; gap: 0.4rem; align-items: center">
-                <strong>{{ displayName(m) }}</strong>
-                <span v-if="m.role === 'owner'" class="role-pill">owner</span>
-                <span v-if="!m.userId" class="role-pill invited">invitado</span>
+            <template v-if="editingMemberId === m.id">
+              <!-- Modo edición inline -->
+              <div class="member-edit gst-stack" style="flex: 1; gap: 0.5rem">
+                <input
+                  v-model="editName"
+                  type="text"
+                  placeholder="Nombre"
+                  class="text-input"
+                  maxlength="100"
+                />
+                <input
+                  v-model="editEmail"
+                  type="email"
+                  placeholder="email@example.com"
+                  class="text-input"
+                />
+                <div class="member-edit-actions">
+                  <button
+                    type="button"
+                    class="ghost-btn"
+                    :disabled="savingEdit"
+                    @click="cancelEditMember"
+                  >
+                    Cancelar
+                  </button>
+                  <button
+                    type="button"
+                    class="primary-btn"
+                    :disabled="savingEdit"
+                    @click="saveEditMember(m.id)"
+                  >
+                    <i v-if="savingEdit" class="pi pi-spin pi-spinner" />
+                    <span v-else>Guardar</span>
+                  </button>
+                </div>
               </div>
-              <div class="gst-muted" style="font-size: 0.8rem">
-                {{ memberEmail(m) ?? '—' }}
+            </template>
+            <template v-else>
+              <MemberAvatar
+                :name="m.user?.name ?? m.invitedName ?? m.invitedEmail"
+                :avatar-url="m.user?.avatarUrl"
+                :size="38"
+              />
+              <div style="flex: 1; min-width: 0">
+                <div style="display: flex; gap: 0.4rem; align-items: center; flex-wrap: wrap">
+                  <strong>{{ displayName(m) }}</strong>
+                  <span v-if="m.role === 'owner'" class="role-pill">owner</span>
+                  <span v-if="!m.userId" class="role-pill invited">invitado</span>
+                </div>
+                <div class="gst-muted" style="font-size: 0.8rem; word-break: break-all">
+                  {{ memberEmail(m) ?? '—' }}
+                </div>
               </div>
-            </div>
-            <button
-              v-if="isOwner && m.userId !== group.createdById"
-              class="remove-btn"
-              @click="removeMember(m.id)"
-              aria-label="Quitar"
-            >
-              <i class="pi pi-times" />
-            </button>
+              <div class="member-actions">
+                <button
+                  v-if="isOwner && !m.userId"
+                  class="icon-btn-sm"
+                  @click="startEditMember(m)"
+                  aria-label="Editar"
+                  title="Editar"
+                >
+                  <i class="pi pi-pencil" />
+                </button>
+                <button
+                  v-if="isOwner && m.userId !== group.createdById"
+                  class="icon-btn-sm remove-btn"
+                  @click="removeMember(m.id)"
+                  aria-label="Quitar"
+                  title="Quitar"
+                >
+                  <i class="pi pi-times" />
+                </button>
+              </div>
+            </template>
           </li>
         </ul>
 
@@ -294,7 +386,6 @@ function goEdit() {
             type="text"
             placeholder="Nombre"
             class="text-input"
-            style="max-width: 140px"
           />
           <button
             type="button"
@@ -339,16 +430,26 @@ function goEdit() {
   background: var(--gst-primary);
   color: white;
   border: none;
-  padding: 0.5rem 0.9rem;
-  border-radius: 8px;
-  font-size: 0.9rem;
+  padding: 0.65rem 1rem;
+  min-height: 44px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.4rem;
 }
-.primary-btn:hover {
+.primary-btn:hover:not(:disabled) {
   background: var(--gst-primary-dark);
+}
+.primary-btn:active {
+  transform: scale(0.98);
+}
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 .exp-wrap {
   display: flex;
@@ -382,16 +483,59 @@ function goEdit() {
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.6rem;
 }
 .member-list li {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.8rem;
   background: var(--gst-surface);
   border: 1px solid var(--gst-border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  min-height: 60px;
+}
+.member-actions {
+  display: flex;
+  gap: 0.25rem;
+}
+.icon-btn-sm {
+  background: transparent;
+  border: none;
+  color: var(--gst-text-muted);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
   border-radius: 8px;
-  padding: 0.6rem 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.95rem;
+}
+.icon-btn-sm:hover {
+  background: var(--gst-bg);
+  color: var(--gst-primary-dark);
+}
+.icon-btn-sm.remove-btn:hover {
+  color: var(--gst-danger);
+}
+.member-edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+.ghost-btn {
+  background: transparent;
+  border: 1px solid var(--gst-border);
+  color: var(--gst-text-muted);
+  padding: 0.55rem 0.9rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  cursor: pointer;
+  min-height: 40px;
+}
+.ghost-btn:hover:not(:disabled) {
+  background: var(--gst-bg);
 }
 .role-pill {
   font-size: 0.7rem;
@@ -420,15 +564,25 @@ function goEdit() {
 }
 .add-row {
   display: flex;
-  gap: 0.4rem;
-  padding: 0.6rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.85rem;
+}
+.add-row .text-input {
+  /* Permitir que los inputs se acomoden en filas separadas en pantallas chicas */
+  flex: 1 1 160px;
+  min-width: 0;
+}
+.add-row .add-btn {
+  flex: 0 0 auto;
 }
 .text-input {
   width: 100%;
-  padding: 0.55rem 0.7rem;
+  padding: 0.7rem 0.85rem;
+  min-height: 44px;
   border: 1px solid var(--gst-border);
-  border-radius: 8px;
-  font-size: 0.9rem;
+  border-radius: 10px;
+  font-size: 16px;
   background: white;
   font-family: inherit;
 }
@@ -441,12 +595,19 @@ function goEdit() {
   background: var(--gst-primary);
   color: white;
   border: none;
-  width: 42px;
-  border-radius: 8px;
+  min-width: 48px;
+  min-height: 44px;
+  border-radius: 10px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 .add-btn:hover:not(:disabled) {
   background: var(--gst-primary-dark);
+}
+.add-btn:active:not(:disabled) {
+  transform: scale(0.96);
 }
 .add-btn:disabled {
   opacity: 0.6;

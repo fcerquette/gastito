@@ -5,6 +5,7 @@ import type {
   Group,
   GroupMember,
   UpdateGroupPayload,
+  UpdateMemberPayload,
 } from '@/types';
 
 export const groupsApi = {
@@ -34,6 +35,18 @@ export const groupsApi = {
 
   addMember: async (id: string, payload: AddMemberPayload): Promise<GroupMember> => {
     const { data } = await api.post<GroupMember>(`/groups/${id}/members`, payload);
+    return data;
+  },
+
+  updateMember: async (
+    id: string,
+    memberId: string,
+    payload: UpdateMemberPayload,
+  ): Promise<GroupMember> => {
+    const { data } = await api.patch<GroupMember>(
+      `/groups/${id}/members/${memberId}`,
+      payload,
+    );
     return data;
   },
 

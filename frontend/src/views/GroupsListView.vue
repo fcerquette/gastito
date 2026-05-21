@@ -64,23 +64,29 @@ function newGroup() {
 <style scoped>
 .fab {
   position: fixed;
-  right: max(1rem, calc((100vw - 600px) / 2 + 1rem));
-  bottom: 1.5rem;
-  width: 56px;
-  height: 56px;
+  right: max(var(--gst-pad-x), calc((100vw - 600px) / 2 + var(--gst-pad-x)));
+  /* Respeta el home indicator del iPhone */
+  bottom: calc(1.5rem + var(--safe-bottom));
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: var(--gst-primary);
   color: white;
   border: none;
-  font-size: 1.4rem;
+  font-size: 1.5rem;
   cursor: pointer;
-  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+  box-shadow: 0 6px 16px rgba(16, 185, 129, 0.45);
   display: flex;
   align-items: center;
   justify-content: center;
+  /* Asegura que esté arriba del contenido */
+  z-index: 30;
 }
 .fab:hover {
   background: var(--gst-primary-dark);
+}
+.fab:active {
+  transform: scale(0.96);
 }
 .primary-btn {
   background: var(--gst-primary);

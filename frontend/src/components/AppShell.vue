@@ -63,6 +63,8 @@ function goBack() {
 <style scoped>
 .shell {
   min-height: 100vh;
+  /* Asegura que el fondo se vea hasta abajo (importante en iPhone landscape) */
+  min-height: 100dvh;
 }
 
 .shell-top {
@@ -71,6 +73,8 @@ function goBack() {
   z-index: 20;
   background: var(--gst-surface);
   border-bottom: 1px solid var(--gst-border);
+  /* Empuja el header debajo del notch del iPhone */
+  padding-top: var(--safe-top);
 }
 
 .shell-top-inner {
@@ -79,7 +83,10 @@ function goBack() {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.75rem 1rem;
+  padding-top: 0.6rem;
+  padding-bottom: 0.6rem;
+  padding-left: max(var(--gst-pad-x), var(--safe-left));
+  padding-right: max(var(--gst-pad-x), var(--safe-right));
 }
 
 .shell-title {
@@ -93,9 +100,15 @@ function goBack() {
   border: none;
   cursor: pointer;
   font-size: 1.1rem;
+  /* Touch target mínimo de 44x44 (Apple HIG / Material) */
+  min-width: 44px;
+  min-height: 44px;
   padding: 0.4rem;
   border-radius: 8px;
   color: var(--gst-text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .icon-btn:hover {
@@ -104,10 +117,19 @@ function goBack() {
 
 .brand-emoji {
   font-size: 1.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
 }
 
 .avatar-link {
   display: flex;
   align-items: center;
+  /* También touch-target cómodo */
+  min-width: 44px;
+  min-height: 44px;
+  justify-content: center;
 }
 </style>

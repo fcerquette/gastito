@@ -70,3 +70,14 @@ export class AddMemberDto {
   @MaxLength(100)
   name?: string;
 }
+
+export class UpdateMemberDto {
+  @IsOptional()
+  @IsEmail()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  name?: string;
+}

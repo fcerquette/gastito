@@ -115,7 +115,6 @@ async function submit() {
           type="text"
           placeholder="Nombre"
           class="text-input"
-          style="max-width: 140px"
         />
         <button type="button" class="add-btn" @click="addMember">
           <i class="pi pi-plus" />
@@ -145,10 +144,11 @@ async function submit() {
 <style scoped>
 .text-input {
   width: 100%;
-  padding: 0.6rem 0.8rem;
+  padding: 0.75rem 0.9rem;
+  min-height: 44px;
   border: 1px solid var(--gst-border);
-  border-radius: 8px;
-  font-size: 0.95rem;
+  border-radius: 10px;
+  font-size: 16px;
   background: white;
   font-family: inherit;
 }
@@ -159,18 +159,31 @@ async function submit() {
 }
 .add-row {
   display: flex;
-  gap: 0.4rem;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+.add-row .text-input {
+  flex: 1 1 160px;
+  min-width: 0;
 }
 .add-btn {
   background: var(--gst-primary);
   color: white;
   border: none;
-  width: 42px;
-  border-radius: 8px;
+  min-width: 48px;
+  min-height: 44px;
+  border-radius: 10px;
   cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
 }
 .add-btn:hover {
   background: var(--gst-primary-dark);
+}
+.add-btn:active {
+  transform: scale(0.96);
 }
 .member-list {
   list-style: none;

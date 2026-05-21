@@ -120,6 +120,11 @@ export interface AddMemberPayload {
   name?: string;
 }
 
+export interface UpdateMemberPayload {
+  email?: string;
+  name?: string;
+}
+
 export interface SplitInput {
   groupMemberId: string;
   /** Requerido si splitMode = 'amounts' o 'percentages'. Ignorado si 'equal'. */
